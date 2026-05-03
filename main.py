@@ -55,14 +55,16 @@ app.include_router(weather_router, prefix="/api/weather",  tags=["Weather"])
 app.include_router(survey_router,  prefix="/api/survey",   tags=["Survey"])
 app.include_router(market_router,  prefix="/api/market",   tags=["Market Prices"])
 
-# ===== HEALTH CHECK ENDPOINT =====
+from fastapi.responses import FileResponse
+
+# ===== FRONTEND ENDPOINTS =====
 @app.get("/")
-def root():
-    return {
-        "status": "running",
-        "message": "Smart Agriculture Assistant API",
-        "docs": "/docs"  # Auto-generated Swagger UI
-    }
+def serve_index():
+    return FileResponse("index.html")
+
+@app.get("/hero_bg.png")
+def serve_hero():
+    return FileResponse("hero_bg.png")
 
 # ===== RUN SERVER =====
 if __name__ == "__main__":
