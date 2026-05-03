@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Agriculture Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* =============================================
+       CSS VARIABLES — Design System Tokens
+       All colors, fonts, spacing defined here.
+       Change once → updates entire site.
+    ============================================= */
+    :root {
+      --green-900: #0a2e1a;
+      --green-800: #0f4526;
+      --green-700: #1a6635;
+      --green-600: #228b46;
+      --green-500: #2ecc71;
+      --green-400: #52d98a;
+      --green-100: #d4f5e2;
+      --earth-800: #3d2b1f;
+      --earth-600: #7a5230;
+      --earth-400: #c4883a;
+      --earth-200: #f0d4a0;
+      --sky-500: #2196f3;
+      --sky-300: #64b5f6;
+      --yellow-400: #ffd740;
+      --red-400: #ef5350;
+      --white: #f9fef4;
+      --gray-100: #e8f0e9;
+      --gray-300: #b0c4b5;
+      --gray-600: #5a7060;
+      --gray-800: #1c2e20;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 28px;
+      --shadow-card: 0 4px 32px rgba(10,46,26,0.12);
+      --shadow-hover: 0 12px 48px rgba(10,46,26,0.22);
+      --transition: 0.3s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--green-900);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: var(--font-body); border: none; outline: none; }
+
+    /* =============================================
+       UTILITY CLASSES
+    ============================================= */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--green-400);
+      font-weight: 300;
+      margin-top: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .badge-green { background: var(--green-600); color: var(--white); }
+    .badge-earth  { background: var(--earth-600); color: var(--white); }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeIn 0.7s ease forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; transform: none; }
+    }
+
+    /* =============================================
+       NAVIGATION
+    ============================================= */
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green-400);
+    }
+    .nav-logo .leaf { font-size: 1.6rem; }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-300);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--green-500);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover { color: var(--green-400); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      padding: 10px 22px;
+      background: var(--green-600);
+      color: var(--white);
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .nav-cta:hover { background: var(--green-500); transform: translateY(-2px); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; background: none; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--green-400); border-radius: 2px; transition: var(--transition); }
+
+    /* =============================================
+       HERO SECTION
+    ============================================= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 68px;
+    }
+    /* Animated background mesh */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(34,139,70,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 80% at 20% 80%, rgba(196,136,58,0.12) 0%, transparent 60%),
+        linear-gradient(180deg, var(--green-900) 0%, #061a0e 100%);
+      z-index: 0;
+    }
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--green-500);
+      opacity: 0.08;
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.08; }
+      90%  { opacity: 0.08; }
+      100% { transform: translateY(-20px) rotate(720deg); opacity: 0; }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(46,204,113,0.1);
+      border: 1px solid rgba(46,204,113,0.3);
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--green-400);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      animation: fadeIn 0.6s ease 0.1s forwards;
+      opacity: 0;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      animation: fadeIn 0.7s ease 0.25s forwards;
+      opacity: 0;
+    }
+    .hero-title .accent { color: var(--green-400); }
+    .hero-title .earth-accent { color: var(--earth-400); }
+    .hero-desc {
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--gray-300);
+      max-width: 560px;
+      margin-bottom: 36px;
+      animation: fadeIn 0.7s ease 0.4s forwards;
+      opacity: 0;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeIn 0.7s ease 0.55s forwards;
+      opacity: 0;
+    }
+    .btn-primary {
+      padding: 14px 32px;
+      background: var(--green-600);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 20px rgba(34,139,70,0.35);
+    }
+    .btn-primary:hover {
+      background: var(--green-500);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(46,204,113,0.4);
+    }
+    .btn-outline {
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--green-400);
+      border: 1.5px solid rgba(46,204,113,0.4);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .btn-outline:hover {
+      background: rgba(46,204,113,0.08);
+      border-color: var(--green-400);
+      transform: translateY(-3px);
+    }
+    /* Hero stats */
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 56px;
+      animation: fadeIn 0.7s ease 0.7s forwards;
+      opacity: 0;
+    }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--green-400);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--gray-600); margin-top: 4px; }
+    /* Right side hero visual */
+    .hero-visual {
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 520px;
+      height: 520px;
+      z-index: 1;
+      animation: fadeIn 0.8s ease 0.5s forwards;
+      opacity: 0;
+    }
+    .hero-visual-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(46,204,113,0.15);
+      animation: spin 20s linear infinite;
+    }
+    .hero-visual-ring:nth-child(2) {
+      inset: 40px;
+      border-color: rgba(196,136,58,0.12);
+      animation-direction: reverse;
+      animation-duration: 15s;
+    }
+    .hero-visual-ring:nth-child(3) {
+      inset: 80px;
+      border-color: rgba(46,204,113,0.1);
+      animation-duration: 25s;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hero-visual-center {
+      position: absolute;
+      inset: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(34,139,70,0.2) 0%, transparent 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+    }
+    /* Floating feature cards on hero */
+    .floating-card {
+      position: absolute;
+      background: rgba(15,69,38,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: var(--shadow-card);
+    }
+    .floating-card .icon { font-size: 1.3rem; }
+    .fc-1 { top: 15%; left: 5%; animation: bob 4s ease-in-out infinite; }
+    .fc-2 { top: 35%; right: 8%; animation: bob 4s ease-in-out infinite 1s; }
+    .fc-3 { bottom: 25%; left: 10%; animation: bob 4s ease-in-out infinite 2s; }
+    .fc-4 { bottom: 18%; right: 5%; animation: bob 4s ease-in-out infinite 0.5s; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* =============================================
+       FEATURES SECTION
+    ============================================= */
+    #features {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #061a0e 0%, var(--green-900) 100%);
+    }
+    .features-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: rgba(15,69,38,0.5);
+      border: 1px solid rgba(46,204,113,0.12);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green-600), var(--green-400));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--transition);
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(46,204,113,0.3);
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-icon {
+      width: 56px; height: 56px;
+      background: rgba(46,204,113,0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      border: 1px solid rgba(46,204,113,0.15);
+    }
+    .feature-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--gray-300);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .feature-link {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--green-400);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap var(--transition);
+    }
+    .feature-card:hover .feature-link { gap: 10px; }
+
+    /* =============================================
+       DEMO / TOOL SECTIONS
+    ============================================= */
+    .tool-section {
+      padding: 100px 0;
+      border-top: 1px solid rgba(46,204,113,0.08);
+    }
+    .tool-section:nth-child(even) { background: rgba(0,0,0,0.15); }
+    .tool-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .tool-layout.reverse { direction: rtl; }
+    .tool-layout.reverse > * { direction: ltr; }
+    .tool-content { }
+    .tool-badge { margin-bottom: 16px; }
+    .tool-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .tool-desc {
+      font-size: 1rem;
+      color: var(--gray-300);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+    /* Input form cards */
+    .tool-card {
+      background: rgba(15,69,38,0.6);
+      border: 1px solid rgba(46,204,113,0.15);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+    }
+    .tool-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: var(--green-400);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--gray-300);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 11px 16px;
+      background: rgba(10,46,26,0.7);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      appearance: none;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(46,204,113,0.12);
+    }
+    .form-input::placeholder { color: var(--gray-600); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(46,204,113,0.08);
+      border: 1px solid rgba(46,204,113,0.25);
+      border-radius: var(--radius-sm);
+      display: none;
+    }
+    .result-box.visible { display: block; }
+    .result-title { font-size: 0.75rem; color: var(--green-400); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .result-value { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--green-400); }
+    .result-sub { font-size: 0.82rem; color: var(--gray-300); margin-top: 4px; }
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed rgba(46,204,113,0.3);
+      border-radius: var(--radius-md);
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--green-500);
+      background: rgba(46,204,113,0.05);
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .upload-text { font-size: 0.9rem; color: var(--gray-300); }
+    .upload-sub { font-size: 0.78rem; color: var(--gray-600); margin-top: 4px; }
+    /* Weather card */
+    .weather-card {
+      background: linear-gradient(135deg, rgba(33,150,243,0.15) 0%, rgba(15,69,38,0.6) 100%);
+      border: 1px solid rgba(33,150,243,0.25);
+      border-radius: var(--radius-md);
+      padding: 32px;
+    }
+    .weather-temp {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .weather-icon { font-size: 3rem; margin-bottom: 8px; }
+    .weather-detail { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+    .weather-item { font-size: 0.85rem; color: var(--gray-300); }
+    .weather-item strong { display: block; font-size: 1.1rem; color: var(--white); }
+    /* Market table */
+    .market-table { width: 100%; border-collapse: collapse; }
+    .market-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-600);
+      border-bottom: 1px solid rgba(46,204,113,0.12);
+    }
+    .market-table td {
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(46,204,113,0.06);
+    }
+    .price-up { color: var(--green-400); }
+    .price-down { color: var(--red-400); }
+    .price-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* =============================================
+       GOVERNMENT SCHEMES SECTION
+    ============================================= */
+    #schemes { padding: 100px 0; }
+    .schemes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .scheme-card {
+      background: rgba(15,69,38,0.5);
+      border: 1px solid rgba(46,204,113,0.12);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      transition: transform var(--transition);
+    }
+    .scheme-card:hover { transform: translateY(-4px); }
+    .scheme-icon { font-size: 2rem; margin-bottom: 12px; }
+    .scheme-name { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+    .scheme-desc { font-size: 0.85rem; color: var(--gray-300); line-height: 1.65; }
+    .scheme-link {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--green-400);
+      font-weight: 600;
+    }
+
+    /* =============================================
+       HOW IT WORKS
+    ============================================= */
+    #how {
+      padding: 100px 0;
+      background: rgba(0,0,0,0.2);
+    }
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-top: 64px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 36px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green-700), var(--green-500), var(--green-700));
+    }
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 0 20px;
+      position: relative;
+    }
+    .step-num {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--green-800);
+      border: 2px solid var(--green-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--green-400);
+      margin: 0 auto 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .step-title { font-weight: 700; margin-bottom: 8px; }
+    .step-desc { font-size: 0.85rem; color: var(--gray-300); line-height: 1.6; }
+
+    /* =============================================
+       TECH STACK
+    ============================================= */
+    #tech { padding: 80px 0; border-top: 1px solid rgba(46,204,113,0.08); }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .tech-card {
+      background: rgba(15,69,38,0.4);
+      border: 1px solid rgba(46,204,113,0.1);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      transition: transform var(--transition), border-color var(--transition);
+    }
+    .tech-card:hover { transform: translateY(-4px); border-color: rgba(46,204,113,0.3); }
+    .tech-emoji { font-size: 2rem; margin-bottom: 8px; }
+    .tech-name { font-weight: 600; font-size: 0.9rem; }
+    .tech-role { font-size: 0.75rem; color: var(--gray-600); margin-top: 2px; }
+
+    /* =============================================
+       SURVEY / CONTACT SECTION
+    ============================================= */
+    #survey {
+      padding: 100px 0;
+      background: linear-gradient(135deg, rgba(10,46,26,0.8), rgba(6,10,6,0.95));
+    }
+    .survey-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .survey-content .section-title { margin-bottom: 16px; }
+    .survey-card {
+      background: rgba(15,69,38,0.6);
+      border: 1px solid rgba(46,204,113,0.15);
+      border-radius: var(--radius-md);
+      padding: 36px;
+    }
+    .survey-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      margin-bottom: 24px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--green-600);
+      color: var(--white);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 8px;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-submit:hover { background: var(--green-500); transform: translateY(-2px); }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      background: #040f07;
+      padding: 64px 0 32px;
+      border-top: 1px solid rgba(46,204,113,0.08);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand p {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-top: 12px;
+      max-width: 280px;
+    }
+    .footer-col h5 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-600);
+      margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a { font-size: 0.9rem; color: var(--gray-300); transition: color var(--transition); }
+    .footer-col a:hover { color: var(--green-400); }
+    .footer-bottom {
+      padding-top: 24px;
+      border-top: 1px solid rgba(46,204,113,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--gray-600);
+    }
+    .footer-bottom .accent { color: var(--green-400); }
+
+    /* =============================================
+       LANGUAGE TOGGLE
+    ============================================= */
+    .lang-toggle {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(46,204,113,0.1);
+      color: var(--green-400);
+      border: 1px solid rgba(46,204,113,0.2);
+      transition: background var(--transition);
+    }
+    .lang-btn.active { background: var(--green-600); color: var(--white); }
+
+    /* =============================================
+       SCROLL TO TOP
+    ============================================= */
+    #scrollTop {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px; height: 48px;
+      background: var(--green-600);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity var(--transition), transform var(--transition), background var(--transition);
+      z-index: 99;
+      box-shadow: 0 4px 16px rgba(34,139,70,0.4);
+    }
+    #scrollTop.visible { opacity: 1; transform: none; }
+    #scrollTop:hover { background: var(--green-500); }
+
+    /* =============================================
+       LOADING STATE
+    ============================================= */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(46,204,113,0.2);
+      border-top-color: var(--green-400);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 1024px) {
+      .hero-visual { display: none; }
+      .tool-layout { grid-template-columns: 1fr; gap: 36px; }
+      .tool-layout.reverse { direction: ltr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .survey-wrapper { grid-template-columns: 1fr; gap: 40px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { flex-direction: column; gap: 32px; }
+      .steps::before { display: none; }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      .hero-stats { gap: 24px; flex-wrap: wrap; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* Mobile nav overlay */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--green-900);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .mobile-nav-close {
+      position: absolute;
+      top: 20px; right: 24px;
+      font-size: 2rem;
+      background: none;
+      color: var(--white);
+    }
+  
+    /* =============================================
+       NEW UI UPGRADES (Nav Pill, Spotlight, Forms)
+    ============================================= */
+    /* Floating Pill Nav */
+    nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1100px;
+      border-radius: 99px;
+      background: rgba(10,46,26,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      padding: 0 24px;
+      height: 64px;
+      z-index: 1000;
+    }
+    #hero {
+      padding-top: 100px; /* offset for pill nav */
+    }
+
+    
+    /* Form Floating Labels Fixes */
+    .form-group {
+      position: relative;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 20px 16px 8px;
+      background: rgba(10,46,26,0.6);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .form-label {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-size: 0.95rem;
+      color: var(--gray-600);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+    .form-input:focus ~ .form-label,
+    .form-input:not(:placeholder-shown) ~ .form-label,
+    .form-select:focus ~ .form-label,
+    .form-select:not([value=""]) ~ .form-label {
+      top: 6px;
+      font-size: 0.7rem;
+      color: var(--green-400);
+      font-weight: 600;
+    }
+    
+    /* Icon alignment fixes */
+    .btn-primary, .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+    .feature-icon, .scheme-icon, .upload-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+/* Old Form Floating Labels */
+    .form-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 16px 16px 8px;
+      background: rgba(10,46,26,0.6);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .form-label {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font-size: 0.95rem;
+      color: var(--gray-600);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+    .form-input:focus ~ .form-label,
+    .form-input:not(:placeholder-shown) ~ .form-label,
+    .form-select:focus ~ .form-label,
+    .form-select:not([value=""]) ~ .form-label {
+      top: 4px;
+      left: 16px;
+      font-size: 0.65rem;
+      color: var(--green-400);
+      font-weight: 600;
+    }
+    .form-input::placeholder {
+      color: transparent; /* hide placeholder for floating label to work */
+    }
+    .form-input:focus {
+      border-color: var(--green-500);
+      background: rgba(10,46,26,0.9);
+      box-shadow: 0 4px 16px rgba(46,204,113,0.15);
+    }
+
+    /* Spotlight Card Effect */
+    .feature-card, .tool-card, .scheme-card, .tech-card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(15,69,38,0.5);
+      border: 1px solid rgba(46,204,113,0.15);
+      backdrop-filter: blur(10px);
+      z-index: 1;
+    }
+    .spotlight {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(46,204,113,0.15), transparent 40%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .feature-card:hover .spotlight, .tool-card:hover .spotlight, .scheme-card:hover .spotlight, .tech-card:hover .spotlight {
+      opacity: 1;
+    }
+
+    /* Lucide Icon adjustments */
+    .lucide {
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.125em;
+    }
+    .feature-icon .lucide { width: 32px; height: 32px; stroke-width: 1.5; color: var(--green-400); }
+    .scheme-icon .lucide { width: 32px; height: 32px; stroke-width: 1.5; color: var(--green-400); }
+    .tech-emoji .lucide { width: 32px; height: 32px; stroke-width: 1.5; color: var(--green-400); }
+    .icon .lucide { width: 24px; height: 24px; stroke-width: 1.5; color: var(--green-400); }
+    .nav-logo .lucide { width: 28px; height: 28px; stroke-width: 2; color: var(--green-400); }
+    .upload-icon .lucide { width: 48px; height: 48px; stroke-width: 1; color: var(--green-400); }
+    .weather-icon .lucide { width: 64px; height: 64px; stroke-width: 1; color: var(--green-400); }
+
+    /* Hero Background Override */
+    #hero::before {
+      background: url('hero_bg.png') center/cover no-repeat !important;
+      opacity: 0.35;
+      filter: contrast(1.1) brightness(0.9);
+      mix-blend-mode: overlay;
+    }
+    
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav>
+    <div class="nav-logo">
+      <span class="leaf"><i data-lucide="leaf"></i></span>
+      <span>AgriSmart</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#crop">Crop AI</a></li>
+      <li><a href="#disease">Disease</a></li>
+      <li><a href="#weather">Weather</a></li>
+      <li><a href="#market">Market</a></li>
+      <li><a href="#schemes">Schemes</a></li>
+      <li><a href="#survey">Survey</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('te')">తె</button>
+      </div>
+      <a href="#crop" class="nav-cta">Try Now</a>
+    </div>
+    <button class="hamburger" onclick="openMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+    <a href="#features" onclick="closeMobileNav()">Features</a>
+    <a href="#crop" onclick="closeMobileNav()">Crop AI</a>
+    <a href="#disease" onclick="closeMobileNav()">Disease</a>
+    <a href="#weather" onclick="closeMobileNav()">Weather</a>
+    <a href="#market" onclick="closeMobileNav()">Market</a>
+    <a href="#schemes" onclick="closeMobileNav()">Schemes</a>
+    <a href="#survey" onclick="closeMobileNav()">Survey</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <div class="particles" id="particles"></div>
+    <div class="container">
+      <div class="hero-content">
+        
+        <h1 class="hero-title">
+          Smart <span class="accent">Agriculture</span><br/>
+          for <span class="earth-accent">Every</span> Farmer
+        </h1>
+        <p class="hero-desc" data-i18n="heroDesc">
+          AI-powered crop guidance, disease detection, weather forecasting,
+          market prices, and land valuation — all in one platform designed
+          for rural and semi-urban farmers.
+        </p>
+        <div class="hero-actions">
+          <a href="#crop" class="btn-primary"><i data-lucide="sprout"></i> Try Crop Advisor</a>
+          <a href="#features" class="btn-outline">Explore Features →</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">10+</span>
+            <span class="stat-label">Smart Features</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">38</span>
+            <span class="stat-label">Crops Covered</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">95%</span>
+            <span class="stat-label">Disease Accuracy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Floating labels -->
+    <div class="floating-card fc-1"><span class="icon"><i data-lucide="thermometer"></i></span>Live Weather Updates</div>
+    <div class="floating-card fc-2"><span class="icon"><i data-lucide="bot"></i></span>AI Disease Detection</div>
+    <div class="floating-card fc-3"><span class="icon"><i data-lucide="trending-up"></i></span>Market Prices</div>
+    <div class="floating-card fc-4"><span class="icon"><i data-lucide="indian-rupee"></i></span>Land Valuation</div>
+  </section>
+
+  <!-- ===== FEATURES GRID ===== -->
+  <section id="features">
+    <div class="container">
+      <div class="features-header">
+        <p class="section-subtitle">What we offer</p>
+        <h2 class="section-title">Everything a Farmer Needs</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" onclick="scrollTo('#crop')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="wheat"></i></div>
+          <div class="feature-name">Crop Recommendation</div>
+          <p class="feature-desc">Input soil NPK, pH, temperature & rainfall to get the most suitable crop for your land powered by ML.</p>
+          <div class="feature-link">Try it <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#disease')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="microscope"></i></div>
+          <div class="feature-name">Disease Detection</div>
+          <p class="feature-desc">Upload a leaf photo. Our CNN model identifies diseases instantly with 95%+ accuracy and gives treatment tips.</p>
+          <div class="feature-link">Try it <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#land')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="home"></i></div>
+          <div class="feature-name">Land Price Prediction</div>
+          <p class="feature-desc">Estimate land value based on location, size, water source, and soil quality using regression models.</p>
+          <div class="feature-link">Try it <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#weather')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="cloud-sun"></i></div>
+          <div class="feature-name">Weather Forecast</div>
+          <p class="feature-desc">Real-time 7-day weather including temperature, humidity, wind speed, and farming advisories.</p>
+          <div class="feature-link">View <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#market')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="bar-chart-2"></i></div>
+          <div class="feature-name">Market Price Tracker</div>
+          <p class="feature-desc">Live mandi prices for 50+ crops across major agricultural markets updated daily.</p>
+          <div class="feature-link">View <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#soil')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="test-tube"></i></div>
+          <div class="feature-name">Soil Analysis</div>
+          <p class="feature-desc">Enter soil parameters and receive fertilizer recommendations and crop suitability scores.</p>
+          <div class="feature-link">Try it <span>→</span></div>
+        </div>
+        <div class="feature-card" onclick="scrollTo('#schemes')">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="clipboard-list"></i></div>
+          <div class="feature-name">Government Schemes</div>
+          <p class="feature-desc">Stay updated on PM-Kisan, Fasal Bima, and other central & state agricultural schemes.</p>
+          <div class="feature-link">View <span>→</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="spotlight"></div>
+          <div class="feature-icon"><i data-lucide="globe"></i></div>
+          <div class="feature-name">Telugu Support</div>
+          <p class="feature-desc">Full bilingual interface in English and Telugu so every farmer can use the platform comfortably.</p>
+          <div class="feature-link">Switch <span>→</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CROP RECOMMENDATION ===== -->
+  <section id="crop" class="tool-section">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-badge"><span class="badge badge-green"><i data-lucide="wheat"></i> AI Powered</span></div>
+          <h2 class="tool-title">Crop Recommendation<br/>by Soil & Climate</h2>
+          <p class="tool-desc">
+            Our Random Forest model trained on 2,200+ data points analyzes your soil's
+            nitrogen, phosphorus, potassium, pH, humidity, temperature, and rainfall to
+            predict the best crop with high accuracy.
+          </p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> 38 crop types supported
+            </li>
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> Real-time predictions via API
+            </li>
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> Fertilizer suggestions included
+            </li>
+          </ul>
+        </div>
+        <div class="tool-card">
+          <div class="spotlight"></div>
+          <h4>Enter Soil & Climate Data</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-n" placeholder=" " data-ph="e.g. 90" min="0" max="200"/>
+              <label class="form-label">Nitrogen (N) kg/ha</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-p" placeholder=" " data-ph="e.g. 42" min="0" max="150"/>
+              <label class="form-label">Phosphorus (P) kg/ha</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-k" placeholder=" " data-ph="e.g. 43" min="0" max="210"/>
+              <label class="form-label">Potassium (K) kg/ha</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-ph" placeholder=" " data-ph="e.g. 6.5" min="0" max="14" step="0.1"/>
+              <label class="form-label">Soil pH</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-temp" placeholder=" " data-ph="e.g. 25" min="-10" max="50"/>
+              <label class="form-label">Temperature (°C)</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="crop-hum" placeholder=" " data-ph="e.g. 80" min="0" max="100"/>
+              <label class="form-label">Humidity (%)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-input" id="crop-rain" placeholder=" " data-ph="e.g. 200" min="0" max="3000"/>
+              <label class="form-label">Rainfall (mm)</label>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="predictCrop()">
+            <i data-lucide="sprout"></i> Predict Best Crop
+          </button>
+          <div class="result-box" id="crop-result">
+            <div class="result-title">Recommended Crop</div>
+            <div class="result-value" id="crop-result-val">—</div>
+            <div class="result-sub" id="crop-result-sub">Enter values and click predict.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DISEASE DETECTION ===== -->
+  <section id="disease" class="tool-section">
+    <div class="container">
+      <div class="tool-layout reverse">
+        <div class="tool-content">
+          <div class="tool-badge"><span class="badge badge-earth"><i data-lucide="microscope"></i> CNN Model</span></div>
+          <h2 class="tool-title">Plant Disease<br/>Detection</h2>
+          <p class="tool-desc">
+            Upload a clear photo of the affected leaf. Our Convolutional Neural Network
+            trained on the PlantVillage dataset (54,000+ images) classifies 38 disease
+            categories across 14 plant species.
+          </p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> 38 disease categories
+            </li>
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> Treatment recommendations
+            </li>
+            <li style="display:flex;gap:10px;align-items:start;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400)">✓</span> Confidence score shown
+            </li>
+          </ul>
+        </div>
+        <div class="tool-card">
+          <div class="spotlight"></div>
+          <h4>Upload Leaf Image</h4>
+          <div class="upload-zone" id="uploadZone"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleDrop(event)"
+               onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon"><i data-lucide="camera"></i></div>
+            <div class="upload-text">Click or drag & drop a leaf photo here</div>
+            <div class="upload-sub">JPG, PNG, WEBP — max 5MB</div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)"/>
+          </div>
+          <div id="img-preview" style="display:none;margin-top:16px;text-align:center;">
+            <img id="preview-img" style="max-height:180px;border-radius:10px;margin:0 auto;"/>
+            <button onclick="analyzeDisease()" class="btn-primary" style="width:100%;margin-top:12px;">
+              <i data-lucide="microscope"></i> Analyze Disease
+            </button>
+          </div>
+          <div class="result-box" id="disease-result">
+            <div class="result-title">Detected Disease</div>
+            <div class="result-value" id="disease-result-val">—</div>
+            <div class="result-sub" id="disease-result-sub">Upload an image to begin.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LAND PRICE PREDICTION ===== -->
+  <section id="land" class="tool-section">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-badge"><span class="badge badge-earth"><i data-lucide="home"></i> ML Regression</span></div>
+          <h2 class="tool-title">Land Price<br/>Estimator</h2>
+          <p class="tool-desc">
+            Get an estimated land valuation based on location, land size, irrigation type,
+            soil quality, and proximity to roads. Powered by a Gradient Boosting regressor.
+          </p>
+        </div>
+        <div class="tool-card">
+          <div class="spotlight"></div>
+          <h4>Land Details</h4>
+          <div class="form-group">
+            <input type="number" class="form-input" id="land-area" placeholder=" " data-ph="e.g. 2.5" step="0.1"/>
+              <label class="form-label">State / District</label>
+            <select class="form-select" id="land-state">
+              <option value="">Select State</option>
+              <option value="AP">Andhra Pradesh</option>
+              <option value="TS">Telangana</option>
+              <option value="KA">Karnataka</option>
+              <option value="TN">Tamil Nadu</option>
+              <option value="MH">Maharashtra</option>
+              <option value="UP">Uttar Pradesh</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <select class="form-select" id="land-soil">
+              <label class="form-label">Area (Acres)</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="land-road" placeholder=" " data-ph="e.g. 1.2" step="0.1"/>
+              <label class="form-label">Soil Type</label>
+                <option value="1">Black</option>
+                <option value="2">Red</option>
+                <option value="3">Loamy</option>
+                <option value="4">Sandy</option>
+                <option value="5">Alluvial</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <select class="form-select" id="land-irr">
+              <label class="form-label">Irrigation</label>
+                <option value="1">Canal</option>
+                <option value="2">Borewell</option>
+                <option value="3">Rain-fed</option>
+                <option value="4">Drip</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <select class="form-select" id="soil-type">
+              <label class="form-label">Road Distance (km)</label>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="predictLandPrice()">
+            <i data-lucide="indian-rupee"></i> Estimate Value
+          </button>
+          <div class="result-box" id="land-result">
+            <div class="result-title">Estimated Land Value</div>
+            <div class="result-value" id="land-result-val">—</div>
+            <div class="result-sub" id="land-result-sub">Fill in details above.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WEATHER ===== -->
+  <section id="weather" class="tool-section">
+    <div class="container">
+      <div class="tool-layout reverse">
+        <div class="tool-content">
+          <div class="tool-badge"><span class="badge badge-green"><i data-lucide="cloud-sun"></i> Live Data</span></div>
+          <h2 class="tool-title">Real-time Weather<br/>& Farm Advisory</h2>
+          <p class="tool-desc">
+            Enter your city or let us detect your location. Get current conditions plus
+            a 7-day forecast with specific farming advisories like irrigation need,
+            pest risk warnings, and harvesting windows.
+          </p>
+        </div>
+        <div class="weather-card">
+          <div class="spotlight"></div>
+          <div style="display:flex;gap:12px;margin-bottom:20px;">
+            <input type="text" class="form-input" id="weather-city" placeholder="Enter city e.g. Kurnool" style="flex:1;"/>
+            <button onclick="fetchWeather()" class="btn-primary" style="padding:10px 20px;">Go</button>
+          </div>
+          <div id="weather-display">
+            <div class="weather-icon"><i data-lucide="cloud-sun"></i></div>
+            <div class="weather-temp" id="w-temp">—°C</div>
+            <div id="w-desc" style="font-size:1.1rem;color:var(--gray-300);margin-top:4px;">Enter city to load weather</div>
+            <div class="weather-detail">
+              <div class="weather-item"><strong id="w-hum">—%</strong>Humidity</div>
+              <div class="weather-item"><strong id="w-wind">— km/h</strong>Wind</div>
+              <div class="weather-item"><strong id="w-feels">—°C</strong>Feels Like</div>
+              <div class="weather-item"><strong id="w-rain">—%</strong>Rain Chance</div>
+            </div>
+            <div id="w-advisory" style="margin-top:16px;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;font-size:0.85rem;color:var(--gray-300);display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MARKET PRICES ===== -->
+  <section id="market" class="tool-section">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <p class="section-subtitle">Live mandi rates</p>
+          <h2 class="section-title">Market Price Tracker</h2>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select class="form-select" id="market-filter" onchange="filterMarket()" style="width:auto;">
+            <option value="all">All Crops</option>
+            <option value="cereal">Cereals</option>
+            <option value="pulse">Pulses</option>
+            <option value="veggie">Vegetables</option>
+            <option value="fruit">Fruits</option>
+          </select>
+          <button onclick="refreshMarket()" class="btn-outline" style="padding:10px 18px;">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="tool-card" style="overflow-x:auto;">
+          <div class="spotlight"></div>
+        <table class="market-table" id="market-table">
+          <thead>
+            <tr>
+              <th>Crop</th>
+              <th>Category</th>
+              <th>Market</th>
+              <th>Price (₹/qtl)</th>
+              <th>Change</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="market-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SOIL ANALYSIS ===== -->
+  <section id="soil" class="tool-section">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-badge"><span class="badge badge-earth"><i data-lucide="test-tube"></i> Soil Science</span></div>
+          <h2 class="tool-title">Soil Analysis &<br/>Recommendations</h2>
+          <p class="tool-desc">
+            Enter your soil test parameters and receive specific fertilizer dosage
+            recommendations, deficiency warnings, and crop suitability scores
+            tailored for Indian agriculture.
+          </p>
+        </div>
+        <div class="tool-card">
+          <div class="spotlight"></div>
+          <h4>Soil Test Report Values</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="soil-n" placeholder=" " data-ph="0–200"/>
+              <label class="form-label">N (kg/ha)</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="soil-p" placeholder=" " data-ph="0–150"/>
+              <label class="form-label">P (kg/ha)</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="soil-k" placeholder=" " data-ph="0–200"/>
+              <label class="form-label">K (kg/ha)</label>
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-input" id="soil-ph" placeholder=" " data-ph="0–14" step="0.1"/>
+              <label class="form-label">pH</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" class="form-input" id="soil-oc" placeholder=" " data-ph="0–5" step="0.01"/>
+              <label class="form-label">Organic Carbon (%)</label>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="s-name" placeholder=" " data-ph="Enter your name"/>
+              <label class="form-label">Soil Type</label>
+                <option value="black">Black</option>
+                <option value="red">Red</option>
+                <option value="loam">Loamy</option>
+                <option value="sandy">Sandy</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="analyzeSoil()">
+            <i data-lucide="test-tube"></i> Analyze Soil
+          </button>
+          <div class="result-box" id="soil-result">
+            <div class="result-title">Soil Status</div>
+            <div id="soil-result-content">Enter values above.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GOVERNMENT SCHEMES ===== -->
+  <section id="schemes">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:48px;">
+        <p class="section-subtitle">Stay informed</p>
+        <h2 class="section-title">Government Schemes for Farmers</h2>
+      </div>
+      <div class="schemes-grid" id="schemes-grid"></div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:0;">
+        <p class="section-subtitle">Simple process</p>
+        <h2 class="section-title">How It Works</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">Enter Your Data</div>
+          <p class="step-desc">Provide soil test values, climate data, or upload a plant image using the simple forms.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-title">AI Processes</div>
+          <p class="step-desc">Our ML models (Random Forest, CNN, Gradient Boost) analyze your inputs instantly.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-title">Get Recommendations</div>
+          <p class="step-desc">Receive crop suggestions, disease diagnoses, price forecasts, and actionable tips.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-title">Act & Improve</div>
+          <p class="step-desc">Follow the guidance to increase yield, prevent losses, and make smarter decisions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SURVEY / FEEDBACK ===== -->
+  <section id="survey">
+    <div class="container">
+      <div class="survey-wrapper">
+        <div class="survey-content">
+          <p class="section-subtitle">Community Engagement</p>
+          <h2 class="section-title">Farmer<br/>Feedback</h2>
+          <p style="color:var(--gray-300);line-height:1.8;margin-top:16px;">
+            We are conducting a survey to
+            understand the real agricultural challenges in your area. Your feedback
+            directly improves the system.
+          </p>
+          <div style="margin-top:28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;gap:12px;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400);font-size:1.2rem;">✓</span> Takes only 2 minutes
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400);font-size:1.2rem;">✓</span> Anonymous & confidential
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:0.9rem;color:var(--gray-300)">
+              <span style="color:var(--green-400);font-size:1.2rem;">✓</span> Available in Telugu
+            </div>
+          </div>
+        </div>
+        <div class="survey-card">
+          <div class="spotlight"></div>
+          <h3>Farmer Feedback Form</h3>
+          <div class="form-group">
+            <select class="form-select" id="s-challenge">
+              <label class="form-label">Your Name</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="s-village" placeholder=" " data-ph="e.g. Kurnool, Nandyal"/>
+              <label class="form-label">Village / Town</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="s-crop" placeholder=" " data-ph="e.g. Rice, Cotton"/>
+              <label class="form-label">Main Crop Grown</label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Biggest Challenge</label>
+              <option value="">Select a challenge</option>
+              <option>Crop disease / pests</option>
+              <option>Unpredictable weather</option>
+              <option>Low market prices</option>
+              <option>Soil fertility issues</option>
+              <option>Lack of government scheme access</option>
+              <option>No irrigation facilities</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <select class="form-select" id="s-phone">
+              <label class="form-label">Smartphone Access</label>
+              <option value="">Select</option>
+              <option>Yes, with internet</option>
+              <option>Yes, limited internet</option>
+              <option>No smartphone</option>
+            </select>
+          </div>
+          <button class="btn-submit" onclick="submitSurvey()">Submit Feedback →</button>
+          <div id="survey-success" style="display:none;margin-top:16px;padding:12px;background:rgba(46,204,113,0.1);border-radius:8px;text-align:center;font-size:0.9rem;color:var(--green-400);">
+            🙏 Thank you! Your feedback has been recorded.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo" style="font-size:1.4rem;">
+            <span><i data-lucide="leaf"></i></span><span>AgriSmart</span>
+          </div>
+          <p>Empowering farmers with AI-driven insights and real-time market data.</p>
+          <p style="margin-top:12px;font-size:0.8rem;color:var(--gray-600);">Submitted by: P Gowthami<br/>Guided by: M Tharun Kumar Sir</p>
+        </div>
+        <div class="footer-col">
+          <h5>Features</h5>
+          <ul>
+            <li><a href="#crop">Crop Advisor</a></li>
+            <li><a href="#disease">Disease Detection</a></li>
+            <li><a href="#land">Land Price</a></li>
+            <li><a href="#soil">Soil Analysis</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Resources</h5>
+          <ul>
+            <li><a href="#weather">Weather</a></li>
+            <li><a href="#market">Market Prices</a></li>
+            <li><a href="#schemes">Gov Schemes</a></li>
+            <li><a href="#survey">Survey</a></li>
+          </ul>
+        </div>
+        
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 AgriSmart</span>
+        <span>Built with <span class="accent">♥</span> for farmers of India</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to top -->
+  <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ================================================
+    // PARTICLES — Animated background dots
+    // Creates floating particles dynamically
+    // ================================================
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 6 + 3;
+        p.style.cssText = `
+          width:${size}px; height:${size}px;
+          left:${Math.random() * 100}%;
+          animation-duration:${Math.random() * 15 + 10}s;
+          animation-delay:${Math.random() * -20}s;
+        `;
+        container.appendChild(p);
+      }
+    })();
+
+    // ================================================
+    // SCROLL TO TOP button visibility
+    // ================================================
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollTop');
+      btn.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    // ================================================
+    // MOBILE NAV
+    // ================================================
+    function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+    function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+    // ================================================
+    // SCROLL utility
+    // ================================================
+    function scrollTo(id) {
+      document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ================================================
+    // LANGUAGE TOGGLE (EN / Telugu)
+    // Translations stored as data objects
+    // In production, connect to i18n library
+    // ================================================
+    const translations = {
+      en: { heroDesc: "AI-powered crop guidance, disease detection, weather forecasting, market prices, and land valuation — all in one platform designed for rural and semi-urban farmers." },
+      te: { heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై." }
+    };
+    function setLang(lang) {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(lang)));
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang]?.[key]) el.textContent = translations[lang][key];
+      });
+    }
+
+    // ================================================
+    // CROP RECOMMENDATION — Frontend prediction logic
+    // In production: POST to /api/predict/crop
+    // ================================================
+    const cropRules = [
+      { name: '<i data-lucide="wheat"></i> Rice',     cond: (n,p,k,ph,t,h,r) => h>80 && r>200 && t>22 },
+      { name: '<i data-lucide="carrot"></i> Maize',    cond: (n,p,k,ph,t,h,r) => t>18 && h<70 && r<150 },
+      { name: '<i data-lucide="bean"></i> Peanut',   cond: (n,p,k,ph,t,h,r) => ph>5.5 && ph<7 && t>25 && r<150 },
+      { name: '<i data-lucide="circle"></i> Onion',    cond: (n,p,k,ph,t,h,r) => ph>6 && r<100 && t<28 },
+      { name: '<i data-lucide="apple"></i> Tomato',   cond: (n,p,k,ph,t,h,r) => ph>6 && t>20 && t<30 },
+      { name: '<i data-lucide="sprout"></i> Wheat',    cond: (n,p,k,ph,t,h,r) => t<20 && r>100 && r<200 },
+      { name: '<i data-lucide="coffee"></i> Coffee',   cond: (n,p,k,ph,t,h,r) => h>70 && t>20 && r>200 },
+      { name: '<i data-lucide="citrus"></i> Lemon',    cond: (n,p,k,ph,t,h,r) => ph>5.5 && ph<6.5 && t>20 },
+      { name: '<i data-lucide="apple"></i> Mango',    cond: (n,p,k,ph,t,h,r) => t>25 && r<200 },
+      { name: '<i data-lucide="leaf"></i> Sugarcane',cond: (n,p,k,ph,t,h,r) => t>24 && r>150 && h>65 },
+    ];
+
+    
+    async function predictCrop() {
+      const n=+v('crop-n'), p=+v('crop-p'), k=+v('crop-k'),
+            ph=+v('crop-ph'), t=+v('crop-temp'), h=+v('crop-hum'), r=+v('crop-rain');
+      if (!n && !p && !ph) { alert('Please fill in soil data'); return; }
+      const btn = event.target;
+      btn.innerHTML = '<span class="spinner"></span>Predicting...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/predict/crop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nitrogen: n, phosphorus: p, potassium: k, ph: ph, temperature: t, humidity: h, rainfall: r })
+        });
+        const data = await res.json();
+        show('crop-result');
+        id('crop-result-val').textContent = data.crop;
+        id('crop-result-sub').textContent = data.fertilizer_tip + " (Confidence: " + data.confidence + "%)";
+      } catch (err) {
+        alert("API Error: " + err.message);
+      }
+      btn.innerHTML = 'Predict Best Crop';
+      btn.disabled = false;
+    }
+    
+
+    // ================================================
+    // DISEASE DETECTION — Image upload & mock predict
+    // In production: POST image to /api/predict/disease
+    // ================================================
+    const diseases = [
+      { name: 'Tomato Early Blight', conf: '94.2%', treatment: 'Apply copper-based fungicide. Remove infected leaves.' },
+      { name: 'Healthy Leaf <i data-lucide="check-circle"></i>', conf: '97.8%', treatment: 'No action needed. Leaf appears healthy.' },
+      { name: 'Rice Blast', conf: '91.5%', treatment: 'Use tricyclazole 75 WP @ 0.6g/L water. Drain fields.' },
+      { name: 'Bacterial Leaf Blight', conf: '89.3%', treatment: 'Spray streptomycin 500ppm. Avoid overhead irrigation.' },
+      { name: 'Powdery Mildew', conf: '92.7%', treatment: 'Apply sulfur dust or wettable sulfur 0.2%.' },
+    ];
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        id('preview-img').src = evt.target.result;
+        id('img-preview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      id('uploadZone').classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        id('fileInput').files = dt.files;
+        handleFileSelect({ target: id('fileInput') });
+      }
+    }
+    
+    async function analyzeDisease() {
+      const btn = event.target;
+      const fileInput = id('fileInput');
+      if (!fileInput.files[0]) { alert('Please upload an image'); return; }
+      btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+      btn.disabled = true;
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      try {
+        const res = await fetch('/api/predict/disease', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        show('disease-result');
+        id('disease-result-val').textContent = data.disease;
+        id('disease-result-sub').textContent = data.treatment + " (Confidence: " + data.confidence + "%)";
+      } catch (err) {
+        alert("API Error: " + err.message);
+      }
+      btn.innerHTML = 'Analyze Disease';
+      btn.disabled = false;
+    }
+    
+
+    // ================================================
+    // LAND PRICE PREDICTION
+    // In production: POST to /api/predict/land
+    // ================================================
+    const basePrices = { AP: 800000, TS: 750000, KA: 950000, TN: 1100000, MH: 1200000, UP: 450000 };
+    const soilMult  = { 1: 1.2, 2: 0.9, 3: 1.1, 4: 0.8, 5: 1.3 };
+    const irrMult   = { 1: 1.3, 2: 1.1, 3: 0.8, 4: 1.2 };
+
+    
+    async function predictLandPrice() {
+      const state = v('land-state'), area = +v('land-area'),
+            soil = v('land-soil'), irr = v('land-irr'), road = +v('land-road');
+      if (!state || !area) { alert('Fill all land details'); return; }
+      const btn = event.target;
+      btn.innerHTML = '<span class="spinner"></span>Estimating...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/predict/land', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ state: state, area_acres: area, soil_type: +soil, irrigation: +irr, road_km: road })
+        });
+        const data = await res.json();
+        show('land-result');
+        id('land-result-val').textContent = '₹' + data.total_value.toLocaleString('en-IN');
+        id('land-result-sub').textContent = '≈ ₹' + data.per_acre.toLocaleString('en-IN') + ' per acre';
+      } catch (err) {
+        alert("API Error: " + err.message);
+      }
+      btn.innerHTML = 'Estimate Value';
+      btn.disabled = false;
+    }
+    
+
+    // ================================================
+    // WEATHER — Uses OpenWeatherMap API
+    // Replace YOUR_API_KEY with actual key
+    // ================================================
+    
+    async function fetchWeather() {
+      const city = v('weather-city').trim();
+      if (!city) { alert('Enter a city name'); return; }
+      const btn = event.target;
+      btn.innerHTML = '...';
+      try {
+        const res = await fetch('/api/weather?city=' + encodeURIComponent(city));
+        const data = await res.json();
+        if(res.status !== 200) { alert(data.detail || 'City not found'); btn.innerHTML='Go'; return; }
+        id('w-temp').textContent = data.temperature + '°C';
+        id('w-desc').textContent = data.description + ` in ${data.city}`;
+        id('w-hum').textContent = data.humidity + '%';
+        id('w-wind').textContent = data.wind_speed + ' km/h';
+        id('w-feels').textContent = data.feels_like + '°C';
+        id('w-rain').textContent = data.rain_chance + '%';
+        const advisory = document.getElementById('w-advisory');
+        advisory.style.display = 'block';
+        advisory.textContent = data.farming_advisory;
+      } catch(err) {
+        alert("API Error");
+      }
+      btn.innerHTML = 'Go';
+    }
+    
+
+    // ================================================
+    // MARKET PRICES — Static demo data
+    // In production: fetch from Agmarknet / data.gov.in API
+    // ================================================
+    const marketData = [
+      { crop: '<i data-lucide="wheat"></i> Rice',       cat: 'cereal', market: 'Kurnool',    price: 2100, change: +2.1 },
+      { crop: '<i data-lucide="carrot"></i> Maize',      cat: 'cereal', market: 'Nandyal',    price: 1850, change: -1.3 },
+      { crop: '<i data-lucide="bean"></i> Groundnut',  cat: 'pulse',  market: 'Guntur',     price: 5200, change: +3.5 },
+      { crop: '<i data-lucide="circle"></i> Onion',      cat: 'veggie', market: 'Kurnool',    price: 1200, change: -4.2 },
+      { crop: '<i data-lucide="apple"></i> Tomato',     cat: 'veggie', market: 'Madanapalle',price: 800,  change: +7.8 },
+      { crop: '<i data-lucide="leaf"></i> Sugarcane',  cat: 'cereal', market: 'Chittoor',   price: 320,  change: +0.5 },
+      { crop: '<i data-lucide="apple"></i> Mango',      cat: 'fruit',  market: 'Raipur',     price: 4500, change: +1.1 },
+      { crop: '<i data-lucide="bean"></i> Toor Dal',   cat: 'pulse',  market: 'Hyderabad',  price: 8500, change: -0.8 },
+      { crop: '<i data-lucide="bean"></i> Chana Dal',  cat: 'pulse',  market: 'Hyderabad',  price: 6200, change: +2.3 },
+      { crop: '<i data-lucide="flame"></i> Chilli',    cat: 'veggie', market: 'Guntur',     price: 9800, change: +5.2 },
+    ];
+    let currentFilter = 'all';
+
+    
+    let currentFilter = 'all';
+    async function renderMarket(filter) {
+      const tbody = id('market-tbody');
+      try {
+        const res = await fetch('/api/market/prices?category=' + filter);
+        const data = await res.json();
+        tbody.innerHTML = data.data.map(r => `
+          <tr>
+            <td style="font-weight:600">${r.crop}</td>
+            <td><span class="badge badge-green" style="font-size:0.7rem;">${r.category}</span></td>
+            <td style="color:var(--gray-300)">${r.market}</td>
+            <td style="font-weight:700">₹${r.price}</td>
+            <td>
+              <div class="price-change ${r.change >= 0 ? 'price-up' : 'price-down'}">
+                ${r.change >= 0 ? '▲' : '▼'} ${Math.abs(r.change)}%
+              </div>
+            </td>
+            <td style="color:var(--gray-600);font-size:0.8rem">${r.updated}</td>
+          </tr>
+        `).join('');
+      } catch(err) {
+        tbody.innerHTML = "<tr><td colspan='6'>Failed to load market data</td></tr>";
+      }
+    }
+    function filterMarket() {
+      currentFilter = v('market-filter');
+      renderMarket(currentFilter);
+    }
+    function refreshMarket() {
+      renderMarket(currentFilter);
+    }
+    // Load initially
+    document.addEventListener('DOMContentLoaded', () => { renderMarket('all'); });
+    
+
+    // ================================================
+    // SOIL ANALYSIS
+    // ================================================
+    function analyzeSoil() {
+      const n=+v('soil-n'), p=+v('soil-p'), k=+v('soil-k'),
+            ph=+v('soil-ph'), oc=+v('soil-oc'), type=v('soil-type');
+      if (!n && !ph) { alert('Enter soil values'); return; }
+      const btn = event.target;
+      btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+      btn.disabled = true;
+      setTimeout(() => {
+        const alerts = [];
+        if (n < 50)  alerts.push('<i data-lucide="alert-triangle"></i> Low Nitrogen — Apply Urea 120 kg/ha');
+        if (n > 150) alerts.push('<i data-lucide="alert-triangle"></i> High Nitrogen — Reduce N fertilizer');
+        if (p < 25)  alerts.push('<i data-lucide="alert-triangle"></i> Low Phosphorus — Apply DAP 60 kg/ha');
+        if (k < 50)  alerts.push('<i data-lucide="alert-triangle"></i> Low Potassium — Apply MOP 80 kg/ha');
+        if (ph < 5.5)alerts.push('<i data-lucide="alert-triangle"></i> Acidic soil — Apply lime 2 t/ha');
+        if (ph > 8)  alerts.push('<i data-lucide="alert-triangle"></i> Alkaline soil — Apply gypsum 4 t/ha');
+        if (oc < 0.5)alerts.push('<i data-lucide="alert-triangle"></i> Low organic matter — Add FYM 5 t/ha');
+
+        show('soil-result');
+        id('soil-result-content').innerHTML = alerts.length
+          ? `<ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+               ${alerts.map(a => `<li style="font-size:0.85rem;color:var(--earth-200)">${a}</li>`).join('')}
+             </ul>`
+          : `<div style="color:var(--green-400);font-weight:600"><i data-lucide="check-circle"></i> Soil is in good condition for most crops!</div>`;
+        btn.innerHTML = '<i data-lucide="test-tube"></i> Analyze Soil';
+        btn.disabled = false;
+      }, 1000);
+    }
+
+    // ================================================
+    // GOVERNMENT SCHEMES DATA
+    // ================================================
+    const schemes = [
+      { icon: '<i data-lucide="banknote"></i>', name: 'PM-KISAN', desc: '₹6,000/year direct income support to eligible farmer families in three equal installments.', link: '#' },
+      { icon: '<i data-lucide="wheat"></i>', name: 'PM Fasal Bima Yojana', desc: 'Crop insurance scheme providing financial support to farmers suffering crop loss/damage.', link: '#' },
+      { icon: '<i data-lucide="droplet"></i>', name: 'PM Krishi Sinchai Yojana', desc: '"Har Khet Ko Pani" — irrigation water to every field through targeted investment for irrigation.', link: '#' },
+      { icon: '<i data-lucide="test-tube"></i>', name: 'Soil Health Card', desc: 'Free soil testing and Health Card to farmers with crop-wise recommendations for nutrients.', link: '#' },
+      { icon: '<i data-lucide="smartphone"></i>', name: 'e-NAM', desc: 'National Agriculture Market — online trading platform connecting farmers to multiple buyers.', link: '#' },
+      { icon: '<i data-lucide="leaf"></i>', name: 'Paramparagat Krishi', desc: 'Cluster-based organic farming with financial assistance, capacity building, and market support.', link: '#' },
+    ];
+    document.getElementById('schemes-grid').innerHTML = schemes.map(s => `
+      <div class="scheme-card">
+          <div class="spotlight"></div>
+        <div class="scheme-icon">${s.icon}</div>
+        <div class="scheme-name">${s.name}</div>
+        <p class="scheme-desc">${s.desc}</p>
+        <a href="${s.link}" class="scheme-link">Learn More →</a>
+      </div>
+    `).join('');
+
+    // ================================================
+    // SURVEY FORM SUBMISSION
+    // In production: POST to /api/survey
+    // ================================================
+    
+    async function submitSurvey() {
+      const name = v('s-name'), village = v('s-village'), challenge = v('s-challenge'), crop = v('s-crop'), phone = v('s-phone');
+      if (!name || !village || !challenge) { alert('Please fill all required fields'); return; }
+      const btn = event.target;
+      btn.innerHTML = '<span class="spinner"></span>Submitting...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/survey/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, village: village, challenge: challenge, crop: crop, phone_access: phone })
+        });
+        if(res.ok) {
+          id('survey-success').style.display = 'block';
+          btn.style.display = 'none';
+          ['s-name','s-village','s-crop','s-challenge','s-phone'].forEach(f => {
+            const el = id(f);
+            if (el.tagName === 'SELECT') el.selectedIndex = 0;
+            else el.value = '';
+          });
+        }
+      } catch(err) {
+        alert("Failed to submit");
+        btn.innerHTML = 'Submit Feedback →';
+        btn.disabled = false;
+      }
+    }
+    
+
+    // ================================================
+    // INTERSECTION OBSERVER — Animate cards on scroll
+    // ================================================
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          e.target.style.animationDelay = (i * 0.1) + 's';
+          e.target.classList.add('fade-in');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .scheme-card, .tech-card, .step').forEach(el => {
+      observer.observe(el);
+    });
+
+    // ================================================
+    // UTILITIES
+    // ================================================
+    function v(id_) { return document.getElementById(id_)?.value || ''; }
+    function id(id_) { return document.getElementById(id_); }
+    function show(id_) {
+      const el = document.getElementById(id_);
+      if (el) el.classList.add('visible');
+    }
+  </script>
+  <script>
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Spotlight effect logic
+    document.querySelectorAll('.feature-card, .tool-card, .scheme-card, .tech-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--x', x + 'px');
+        card.style.setProperty('--y', y + 'px');
+      });
+    });
+    
+  </script>
+</body>
+</html>
