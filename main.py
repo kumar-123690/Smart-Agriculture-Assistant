@@ -27,6 +27,7 @@ from routes.land import router as land_router
 from routes.weather import router as weather_router
 from routes.survey import router as survey_router
 from routes.market import router as market_router
+from routes.chat import router as chat_router
 
 # ===== CREATE APP =====
 app = FastAPI(
@@ -54,6 +55,7 @@ app.include_router(land_router,    prefix="/api/predict",  tags=["Land Price"])
 app.include_router(weather_router, prefix="/api/weather",  tags=["Weather"])
 app.include_router(survey_router,  prefix="/api/survey",   tags=["Survey"])
 app.include_router(market_router,  prefix="/api/market",   tags=["Market Prices"])
+app.include_router(chat_router,    prefix="/api/chat",     tags=["Voice AI Chatbot"])
 
 from fastapi.responses import FileResponse
 
