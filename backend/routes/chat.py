@@ -28,15 +28,20 @@ if GEMINI_API_KEY and genai:
 @router.post("/")
 async def chat_with_bot(req: ChatRequest):
     if not model:
-        return {"response": "Hello! I am AgriSmart. To make me fully intelligent, please provide a Gemini API Key in the environment variables."}
+        return {"response": "నమస్తే! నేను అగ్రిస్మార్ట్. మీ వ్యవసాయ సహాయకుడిని. మీకు ఎలా సహాయపడగలను? (Hello! I am AgriSmart. How can I help you?)"}
     
     prompt = f"""
-    You are AgriSmart, an extremely polite, helpful, and expert agricultural AI assistant for farmers.
-    The farmer's location is: {req.location}.
-    The current weather is: {req.weather}.
-    The farmer says: "{req.message}"
+    You are AgriSmart, an expert agricultural AI assistant specifically designed for farmers in India.
+    Current Context:
+    - Location: {req.location}
+    - Weather: {req.weather}
+    - Farmer's Query: "{req.message}"
     
-    Answer the farmer directly, keeping the response short (1-2 sentences), simple, and easy to understand when spoken out loud. Answer in the same language the farmer used.
+    Instructions:
+    1. Respond ONLY in Telugu (తెలుగు) unless the farmer explicitly asks for English.
+    2. Use very polite and respectful Telugu honorifics (andi, namaste, etc.).
+    3. Keep responses short (1-2 sentences).
+    4. Provide expert agricultural advice for {req.location}.
     """
     try:
         response = model.generate_content(prompt)

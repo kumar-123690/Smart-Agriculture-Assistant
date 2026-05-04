@@ -22,13 +22,13 @@ import uvicorn
 import os
 
 # Import route modules
-from routes.crop import router as crop_router
-from routes.disease import router as disease_router
-from routes.land import router as land_router
-from routes.weather import router as weather_router
-from routes.survey import router as survey_router
-from routes.market import router as market_router
-from routes.chat import router as chat_router
+from backend.routes.crop import router as crop_router
+from backend.routes.disease import router as disease_router
+from backend.routes.land import router as land_router
+from backend.routes.weather import router as weather_router
+from backend.routes.survey import router as survey_router
+from backend.routes.market import router as market_router
+from backend.routes.chat import router as chat_router
 
 # ===== CREATE APP =====
 app = FastAPI(

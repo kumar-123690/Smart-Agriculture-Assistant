@@ -3341,19 +3341,24 @@
             const { latitude: lat, longitude: lon } = pos.coords;
 
             try {
+              // 🌍 Using OpenStreetMap (Nominatim) for better rural accuracy in India
               const res = await fetchWithTimeout(
-                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
               );
 
               const data = await res.json();
+              const addr = data.address || {};
 
+              // Improved parsing: prioritize village/town for farmers
               const city =
-                data.city ||
-                data.locality ||
-                data.principalSubdivision ||
+                addr.village ||
+                addr.town ||
+                addr.city ||
+                addr.suburb ||
+                addr.county ||
                 "Your Area";
 
-              const state = data.principalSubdivision || "";
+              const state = addr.state || "";
 
               await handleSuccess(city, state);
             } catch (e) {
@@ -3383,8 +3388,8 @@
       if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = false;
-        // Allow any language, browser tries to auto-detect or use OS default
-        recognition.lang = navigator.language || "en-IN";
+        // Set to Telugu (India) for farmers
+        recognition.lang = "te-IN";
         recognition.interimResults = false;
 
         recognition.onstart = function () {
@@ -3442,18 +3447,19 @@
           });
           const data = await res.json();
           id("botBubble").textContent = data.response;
-          speakText(data.response);
+          // Set language for TTS to Telugu
+          speakText(data.response, "te-IN");
         } catch (err) {
           id("botBubble").textContent =
             "Sorry, I am having trouble connecting.";
         }
       }
 
-      function speakText(text) {
+      function speakText(text, lang = "te-IN") {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        // Auto detect language roughly based on text content, or rely on OS default
+        utterance.lang = lang;
         window.speechSynthesis.speak(utterance);
       }
 
@@ -3469,6 +3475,11 @@
             card.style.setProperty("--y", y + "px");
           });
         });
+
+      // 🚀 Auto-detect location on load
+      window.addEventListener("load", () => {
+        setTimeout(detectLocation, 1000);
+      });
     </script>
 
     <!-- Detect Location -->
@@ -3511,7 +3522,7 @@
     <!-- Voice Assistant -->
     <div class="voice-bot">
       <div class="bot-bubble" id="botBubble">
-        Tap the mic and speak in your language!
+        మైక్‌ని నొక్కి మీ భాషలో మాట్లాడండి! (Tap the mic and speak!)
       </div>
       <button class="bot-btn" onclick="toggleVoice()" id="voiceBtn">
         <i
