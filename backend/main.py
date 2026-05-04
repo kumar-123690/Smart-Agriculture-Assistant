@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+import os
 
 # Import route modules
 from routes.crop import router as crop_router
@@ -60,13 +61,16 @@ app.include_router(chat_router,    prefix="/api/chat",     tags=["Voice AI Chatb
 from fastapi.responses import FileResponse
 
 # ===== FRONTEND ENDPOINTS =====
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
+
 @app.get("/")
 def serve_index():
-    return FileResponse("index.html")
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 @app.get("/hero_bg.png")
 def serve_hero():
-    return FileResponse("hero_bg.png")
+    return FileResponse(os.path.join(FRONTEND_DIR, "assets", "hero_bg.png"))
 
 # ===== RUN SERVER =====
 if __name__ == "__main__":
