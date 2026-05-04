@@ -1,12 +1,13 @@
 from fastapi import APIRouter
 from fastapi import Query
 import httpx
+import os
 
-weather_router = APIRouter()
+router = APIRouter()
 
 WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "your_api_key_here")
 
-@weather_router.get("/")
+@router.get("/")
 async def get_weather(city: str = Query(..., description="City name")):
     """
     Fetch real-time weather from OpenWeatherMap API.

@@ -25,8 +25,8 @@ land_model = None
 try:
     with open(MODEL_PATH, "rb") as f:
         land_model = pickle.load(f)
-    print("✅ Land model loaded")
-except: print("⚠️  Land model not found — using formula-based estimation")
+    print("SUCCESS: Land model loaded")
+except: print("WARNING: Land model not found — using formula-based estimation")
 
 @router.post("/land")
 def predict_land(data: LandInput):

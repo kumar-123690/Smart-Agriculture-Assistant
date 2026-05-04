@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 from pydantic import BaseModel as BM
 from typing import Optional
 import json
 from datetime import datetime
 
-survey_router = APIRouter()
+router = APIRouter()
 
 class SurveyData(BM):
     name:       str
@@ -16,7 +16,7 @@ class SurveyData(BM):
 
 SURVEY_FILE = "/tmp/survey_responses.json"
 
-@survey_router.post("/submit")
+@router.post("/submit")
 def submit_survey(data: SurveyData):
     """
     Save farmer survey response to file (or database in production).
@@ -47,7 +47,7 @@ def submit_survey(data: SurveyData):
         "status": "success"
     }
 
-@survey_router.get("/stats")
+@router.get("/stats")
 def get_survey_stats():
     """Get aggregated survey statistics for admin dashboard."""
     try:

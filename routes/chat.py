@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+except Exception as e:
+    genai = None
+    print(f"Voice AI model not loaded (Google GenAI error): {e}")
 
 router = APIRouter()
 
@@ -13,9 +17,13 @@ class ChatRequest(BaseModel):
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 model = None
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+if GEMINI_API_KEY and genai:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+    except Exception as e:
+        print(f"Failed to configure Gemini: {e}")
+        model = None
 
 @router.post("/")
 async def chat_with_bot(req: ChatRequest):

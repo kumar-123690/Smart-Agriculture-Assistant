@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 import random
 from datetime import datetime
 
-market_router = APIRouter()
+router = APIRouter()
 
 # Static crop price database (in production: connect to Agmarknet API)
 # Agmarknet API: https://agmarknet.gov.in/
@@ -23,7 +23,7 @@ CROP_DATA = [
     {"crop": "Banana",    "category": "fruit",   "market": "Anantapur",   "base": 1800},
 ]
 
-@market_router.get("/prices")
+@router.get("/prices")
 def get_market_prices(category: str = "all"):
     """
     Return current mandi prices for crops.
@@ -38,7 +38,7 @@ def get_market_prices(category: str = "all"):
     for crop in CROP_DATA:
         if category != "all" and crop["category"] != category:
             continue
-        # Simulate daily price fluctuation (±5%)
+        # Simulate daily price fluctuation (Â±5%)
         variation = random.uniform(-0.05, 0.05)
         price = round(crop["base"] * (1 + variation))
         change = round(variation * 100, 1)
@@ -48,7 +48,7 @@ def get_market_prices(category: str = "all"):
             "category": crop["category"],
             "market":   crop["market"],
             "price":    price,
-            "unit":     "₹/quintal",
+            "unit":     "â‚¹/quintal",
             "change":   change,
             "updated":  today
         })

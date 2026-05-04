@@ -63,10 +63,11 @@ def load_crop_model():
     global crop_model
     try:
         with open(MODEL_PATH, "rb") as f:
-            crop_model = pickle.load(f)
-        print("✅ Crop model loaded successfully")
+            crop_model_data = pickle.load(f)
+            crop_model = crop_model_data["model"] if isinstance(crop_model_data, dict) else crop_model_data
+        print("Crop model loaded successfully")
     except FileNotFoundError:
-        print("⚠️  Crop model not found — using fallback rule-based system")
+        print("Crop model not found - using fallback rule-based system")
 
 load_crop_model()
 
@@ -107,14 +108,14 @@ def predict_crop(data: CropInput):
 
         if crop_model is not None:
             # Use trained ML model
-            crop_name = crop_model.predict(features)[0]
+            crop_name = str(crop_model.predict(features)[0])
             # predict_proba gives probability for each class
             proba = crop_model.predict_proba(features)[0]
             confidence = round(float(max(proba)) * 100, 1)
             # Get top 3 alternative crops
             classes = crop_model.classes_
             top3_idx = np.argsort(proba)[::-1][:3]
-            alternatives = [classes[i] for i in top3_idx[1:]]
+            alternatives = [str(classes[i]) for i in top3_idx[1:]]
         else:
             # Fallback when model not available
             crop_name = rule_based_crop(

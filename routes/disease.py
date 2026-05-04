@@ -93,9 +93,9 @@ def load_disease_model():
     try:
         import tensorflow as tf
         disease_model = tf.keras.models.load_model(MODEL_PATH)
-        print("✅ Disease CNN model loaded")
+        print("SUCCESS: Disease CNN model loaded")
     except Exception as e:
-        print(f"⚠️  Disease model not loaded: {e}")
+        print(f"WARNING: Disease model not loaded: {e}")
 
 load_disease_model()
 

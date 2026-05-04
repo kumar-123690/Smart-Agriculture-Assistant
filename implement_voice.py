@@ -165,9 +165,12 @@ async def chat_with_bot(req: ChatRequest):
 
     ui_inject = '''
   <!-- Detect Location -->
-  <button class="gps-btn" onclick="detectLocation()" id="gpsBtn">
-    <i data-lucide="map-pin"></i> <span>Detect My Farm</span>
-  </button>
+  <div style="position:fixed; top:100px; right:24px; z-index:100; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+    <button class="gps-btn" onclick="detectLocation()" id="gpsBtn" style="position:static;">
+      <i data-lucide="map-pin"></i> <span>Detect My Farm</span>
+    </button>
+    <div id="locationDisplay" style="display:none; background: rgba(10,46,26,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(46,204,113,0.3); border-radius: 8px; padding: 6px 12px; color: var(--green-400); font-size: 0.8rem; box-shadow: 0 4px 16px rgba(0,0,0,0.2);"></div>
+  </div>
 
   <!-- Voice Assistant -->
   <div class="voice-bot">
@@ -189,45 +192,126 @@ async def chat_with_bot(req: ChatRequest):
 
     async function detectLocation() {
       const btn = id('gpsBtn');
+
+      // Prevent multiple clicks
+      if (btn.dataset.loading === "true") return;
+      btn.dataset.loading = "true";
+
       btn.innerHTML = '<span class="spinner"></span> Locating...';
-      if (!navigator.geolocation) {
-        alert("Geolocation not supported by your browser");
+
+      const setIdle = () => {
+        btn.dataset.loading = "false";
         btn.innerHTML = '<i data-lucide="map-pin"></i> <span>Detect My Farm</span>';
         lucide.createIcons();
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        try {
-          // Reverse geocode via Nominatim
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-          const data = await res.json();
-          const city = data.address.city || data.address.town || data.address.village || data.address.county || "Your Area";
-          const state = data.address.state || "";
-          userLocation = `${city}, ${state}`;
-          
-          btn.innerHTML = `<i data-lucide="check"></i> <span>${city}</span>`;
-          lucide.createIcons();
-          
-          // Auto trigger weather
-          const cityInput = id('weather-city');
-          if(cityInput) {
-            cityInput.value = city;
-            await fetchWeather(); // Will update userWeather internally
-          }
-          
-          // Say hello
-          speakText(`Location detected as ${city}. I am AgriSmart. How can I help you today?`);
-        } catch(e) {
-          btn.innerHTML = '<i data-lucide="map-pin"></i> <span>Detect My Farm</span>';
+      };
+
+      const handleSuccess = async (city, state) => {
+        userLocation = `${city}, ${state}`;
+
+        // Cache location
+        localStorage.setItem("agri_location", JSON.stringify({ city, state }));
+
+        btn.innerHTML = `<i data-lucide="check"></i> <span>Detected</span>`;
+        lucide.createIcons();
+
+        const locDisp = id('locationDisplay');
+        if (locDisp) {
+          locDisp.style.display = 'flex';
+          locDisp.style.alignItems = 'center';
+          locDisp.style.gap = '6px';
+          locDisp.innerHTML = `
+            <i data-lucide="map-pin" style="width:14px;height:14px;"></i> ${userLocation}
+          `;
           lucide.createIcons();
         }
-      }, err => {
-        alert("Could not get location. Please allow GPS permissions.");
-        btn.innerHTML = '<i data-lucide="map-pin"></i> <span>Detect My Farm</span>';
-        lucide.createIcons();
-      });
+
+        const cityInput = id('weather-city');
+        if (cityInput) {
+          cityInput.value = city;
+          await fetchWeather();
+        }
+
+        speakText(`Location detected as ${city}. I am AgriSmart. How can I help you today?`);
+
+        btn.dataset.loading = "false";
+      };
+
+      const fetchWithTimeout = (url, timeout = 8000) => {
+        return Promise.race([
+          fetch(url),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Request timeout")), timeout)
+          )
+        ]);
+      };
+
+      const fallbackToIP = async () => {
+        try {
+          const res = await fetchWithTimeout('https://ipapi.co/json/');
+          const data = await res.json();
+
+          if (data.city) {
+            await handleSuccess(data.city, data.region);
+          } else {
+            throw new Error("No city from IP");
+          }
+        } catch (e) {
+          console.error("IP Location Error:", e);
+
+          setIdle();
+
+          // Better UX than alert
+          speakText("Unable to detect location. Please enter your city manually.");
+        }
+      };
+
+      // 🔹 Load from cache first (instant UX)
+      const cached = localStorage.getItem("agri_location");
+      if (cached) {
+        const { city, state } = JSON.parse(cached);
+        handleSuccess(city, state);
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        fallbackToIP();
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude: lat, longitude: lon } = pos.coords;
+
+          try {
+            const res = await fetchWithTimeout(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+            );
+
+            const data = await res.json();
+
+            const city =
+              data.city ||
+              data.locality ||
+              data.principalSubdivision ||
+              "Your Area";
+
+            const state = data.principalSubdivision || "";
+
+            await handleSuccess(city, state);
+          } catch (e) {
+            console.error("Reverse Geocode Error:", e);
+            fallbackToIP();
+          }
+        },
+        (err) => {
+          console.warn("GPS Denied or Unavailable:", err);
+          fallbackToIP();
+        },
+        {
+          timeout: 10000,
+          enableHighAccuracy: true
+        }
+      );
     }
 
     // ================================================
