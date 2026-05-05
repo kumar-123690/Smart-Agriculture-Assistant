@@ -142,6 +142,36 @@
         font-weight: 700;
         color: var(--green-400);
       }
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 72px;
+        background: rgba(10, 46, 26, 0.9);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(46, 204, 113, 0.15);
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        padding: 0 40px;
+        z-index: 1000;
+      }
+      .nav-logo {
+        justify-self: start;
+      }
+      .nav-links {
+        justify-self: center;
+        display: flex;
+        gap: 28px;
+        list-style: none;
+      }
+      .nav-right {
+        justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
       .nav-logo .leaf {
         font-size: 1.6rem;
       }
@@ -1128,6 +1158,20 @@
           grid-template-columns: 1fr;
           gap: 40px;
         }
+      } /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .floating-actions {
+          top: auto;
+          bottom: 100px;
+          right: 16px;
+        }
+        .voice-bot {
+          bottom: 20px;
+          left: 16px;
+        }
+        nav {
+          padding: 0 20px;
+        }
       }
       @media (max-width: 768px) {
         .nav-links,
@@ -1407,16 +1451,20 @@
         filter: contrast(1.1) brightness(0.9);
         mix-blend-mode: overlay;
       }
-
       /* =============================================
-       VOICE AI & GPS
+       FLOATING ACTIONS
     ============================================= */
-      .gps-btn {
+      .floating-actions {
         position: fixed;
         top: 100px;
         right: 24px;
-        z-index: 100;
-        padding: 10px 16px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+      }
+      .action-btn {
         background: rgba(10, 46, 26, 0.85);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(46, 204, 113, 0.3);
@@ -1425,13 +1473,22 @@
         font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         cursor: pointer;
         transition: 0.3s;
+        padding: 10px 18px;
+        font-size: 0.85rem;
       }
-      .gps-btn:hover {
+      .action-btn:hover {
         background: var(--green-600);
+        color: var(--white);
+        transform: translateX(-5px);
+      }
+
+      .lang-toggle {
+        background: linear-gradient(135deg, var(--earth-600), var(--earth-800));
+        border-color: var(--earth-400);
         color: var(--white);
       }
 
@@ -1481,9 +1538,6 @@
         background: var(--red-400);
         border-color: var(--white);
       }
-      .bot-btn.listening .lucide {
-        color: var(--white);
-      }
       @keyframes pulse-ring {
         0% {
           box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.6);
@@ -1506,24 +1560,18 @@
         <span>AgriSmart</span>
       </div>
       <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#crop">Crop AI</a></li>
-        <li><a href="#disease">Disease</a></li>
-        <li><a href="#weather">Weather</a></li>
-        <li><a href="#market">Market</a></li>
-        <li><a href="#schemes">Schemes</a></li>
-        <li><a href="#survey">Survey</a></li>
+        <li><a href="#home" data-t="nav_home">Home</a></li>
+        <li><a href="#features" data-t="nav_tools">Tools</a></li>
+        <li><a href="#schemes" data-t="nav_schemes">Schemes</a></li>
+        <li><a href="#market" data-t="nav_market">Market</a></li>
+        <li><a href="#contact" data-t="nav_contact">Contact</a></li>
       </ul>
-      <div style="display: flex; align-items: center; gap: 12px">
-        <div class="lang-toggle">
-          <button class="lang-btn active" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" onclick="setLang('te')">తె</button>
-        </div>
-        <a href="#crop" class="nav-cta">Try Now</a>
+      <div class="nav-right">
+        <a href="#crop" class="nav-cta" data-t="nav_cta">Try Now</a>
+        <button class="hamburger" onclick="openMobileNav()">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <button class="hamburger" onclick="openMobileNav()">
-        <span></span><span></span><span></span>
-      </button>
     </nav>
 
     <!-- Mobile nav -->
@@ -1544,10 +1592,12 @@
       <div class="container">
         <div class="hero-content">
           <h1 class="hero-title">
-            Smart <span class="accent">Agriculture</span><br />
-            for <span class="earth-accent">Every</span> Farmer
+            <span data-t="hero_title_1">Smart</span>
+            <span class="accent" data-t="hero_title_2">Agriculture</span><br />
+            <span data-t="hero_title_3">for Every</span>
+            <span class="earth-accent">Farmer</span>
           </h1>
-          <p class="hero-desc" data-i18n="heroDesc">
+          <p class="hero-desc" data-t="hero_desc">
             AI-powered crop guidance, disease detection, weather forecasting,
             market prices, and land valuation — all in one platform designed for
             rural and semi-urban farmers.
@@ -1693,7 +1743,7 @@
                 ><i data-lucide="wheat"></i> AI Powered</span
               >
             </div>
-            <h2 class="tool-title">
+            <h2 class="tool-title" data-t="tool_crop_title">
               Crop Recommendation<br />by Soil & Climate
             </h2>
             <p class="tool-desc">
@@ -1871,7 +1921,9 @@
                 ><i data-lucide="microscope"></i> CNN Model</span
               >
             </div>
-            <h2 class="tool-title">Plant Disease<br />Detection</h2>
+            <h2 class="tool-title" data-t="tool_disease_title">
+              Plant Disease Detection<br />by Image
+            </h2>
             <p class="tool-desc">
               Upload a clear photo of the affected leaf. Our Convolutional
               Neural Network trained on the PlantVillage dataset (54,000+
@@ -1969,9 +2021,13 @@
             <div class="result-box" id="disease-result">
               <div class="result-title">Detected Disease</div>
               <div class="result-value" id="disease-result-val">—</div>
-              <div class="result-sub" id="disease-result-sub">
-                Upload an image to begin.
-              </div>
+              <h1
+                class="hero-title fade-in"
+                data-t="hero_title"
+                style="animation-delay: 0.2s"
+              >
+                Empowering Indian Farmers with Smart AI
+              </h1>
             </div>
           </div>
         </div>
@@ -2538,10 +2594,11 @@
           <div class="footer-col">
             <h5>Features</h5>
             <ul>
-              <li><a href="#crop">Crop Advisor</a></li>
-              <li><a href="#disease">Disease Detection</a></li>
-              <li><a href="#land">Land Price</a></li>
-              <li><a href="#soil">Soil Analysis</a></li>
+              <li><a href="#home" data-t="nav_home">Home</a></li>
+              <li><a href="#features" data-t="nav_tools">Tools</a></li>
+              <li><a href="#schemes" data-t="nav_schemes">Schemes</a></li>
+              <li><a href="#market" data-t="nav_market">Market</a></li>
+              <li><a href="#contact" data-t="nav_contact">Contact</a></li>
             </ul>
           </div>
           <div class="footer-col">
@@ -2625,12 +2682,54 @@
       // ================================================
       const translations = {
         en: {
-          heroDesc:
-            "AI-powered crop guidance, disease detection, weather forecasting, market prices, and land valuation — all in one platform designed for rural and semi-urban farmers.",
+          heroDesc: "AI-powered crop guidance, disease detection, weather forecasting, market prices, and land valuation — all in one platform designed for rural and semi-urban farmers.",
+          detect_farm: "Detect My Farm",
+          detecting: "Locating...",
+          detected: "Detected",
+          nav_home: "Home",
+          nav_tools: "Tools",
+          nav_schemes: "Schemes",
+          nav_market: "Market",
+          nav_contact: "Contact",
+          hero_title: "Empowering Indian Farmers with Smart AI",
+          voice_prompt: "Tap the mic and speak!",
+          voice_listen: "Listening...",
+          voice_thinking: "Thinking...",
+          nav_cta: "Try Now",
+          hero_subtitle: "Empowering Indian Farmers with Smart AI",
+          hero_title_1: "Smart",
+          hero_title_2: "Agriculture",
+          hero_title_3: "for Every",
+          hero_desc: "AI-powered crop guidance, disease detection, weather forecasting, market prices, and land valuation — all in one platform designed for rural and semi-urban farmers.",
+          tool_crop_title: "Crop Recommendation by Soil & Climate",
+          tool_disease_title: "Plant Disease Detection by Image",
+          tool_market_title: "Market Price Analysis",
+          tool_land_title: "Smart Land Valuation"
         },
         te: {
-          heroDesc:
-            "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై.",
+          heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై.",
+          detect_farm: "నా పొలాన్ని గుర్తించు",
+          detecting: "గుర్తిస్తోంది...",
+          detected: "గుర్తించబడింది",
+          nav_home: "హోమ్",
+          nav_tools: "సాధనాలు",
+          nav_schemes: "పథకాలు",
+          nav_market: "మార్కెట్",
+          nav_contact: "సంప్రదించండి",
+          hero_title: "స్మార్ట్ AIతో భారతీయ రైతులకు సాధికారత",
+          voice_prompt: "మైక్‌ని నొక్కి మాట్లాడండి!",
+          voice_listen: "వింటున్నాను...",
+          voice_thinking: "ఆలోచిస్తున్నాను...",
+          nav_cta: "ప్రయత్నించండి",
+          hero_subtitle: "స్మార్ట్ AIతో భారతీయ రైతులకు సాధికారత",
+          hero_title_1: "స్మార్ట్",
+          hero_title_2: "వ్యవసాయం",
+          hero_title_3: "ప్రతి రైతు కోసం",
+          hero_desc: "AI-ఆధారిత పంట మార్గదర్శకత్వం, వ్యాధి గుర్తింపు, వాతావరణ సూచన, మార్కెట్ ధరలు మరియు భూమి మూల్యాంకనం — గ్రామీణ రైతులకు రూపొందించబడిన ఒకే వేదిక.",
+          tool_crop_title: "నేల మరియు వాతావరణం ద్వారా పంట సిఫార్సు",
+          tool_disease_title: "చిత్రం ద్వారా మొక్కల వ్యాధి గుర్తింపు",
+          tool_market_title: "మార్కెట్ ధరల విశ్లేషణ",
+          tool_land_title: "స్మార్ట్ భూమి మూల్యాంకనం"
         },
       };
       function setLang(lang) {
@@ -3231,150 +3330,158 @@
       }
     </script>
     <script>
-      // Initialize Lucide icons
-      lucide.createIcons();
+      // Scripts will initialize on load
 
-      // ================================================
-      // GEOLOCATION & AUTOMATION
-      // ================================================
+      // GLOBAL STATE (Translations moved to top)
+
+      let currentLang = localStorage.getItem("agri_lang") || "en";
       let userLocation = "Unknown";
       let userWeather = "Unknown";
 
       async function detectLocation() {
-        const btn = id("gpsBtn");
+        try {
+          console.log("Starting auto-location detection...");
+          const btn = id("gpsBtn");
+          if (!btn) {
+            console.error("GPS Button not found!");
+            return;
+          }
 
-        // Prevent multiple clicks
-        if (btn.dataset.loading === "true") return;
-        btn.dataset.loading = "true";
+          // Prevent multiple clicks
+          if (btn.dataset.loading === "true") return;
+          btn.dataset.loading = "true";
 
-        btn.innerHTML = '<span class="spinner"></span> Locating...';
+          btn.innerHTML = `<span class="spinner"></span> <span data-t="detecting">${translations[currentLang].detecting}</span>`;
 
-        const setIdle = () => {
-          btn.dataset.loading = "false";
-          btn.innerHTML =
-            '<i data-lucide="map-pin"></i> <span>Detect My Farm</span>';
-          lucide.createIcons();
-        };
-
-        const handleSuccess = async (city, state) => {
-          userLocation = `${city}, ${state}`;
-
-          // Cache location
-          localStorage.setItem(
-            "agri_location",
-            JSON.stringify({ city, state }),
-          );
-
-          btn.innerHTML = `<i data-lucide="check"></i> <span>Detected</span>`;
-          lucide.createIcons();
-
-          const locDisp = id("locationDisplay");
-          if (locDisp) {
-            locDisp.style.display = "flex";
-            locDisp.style.alignItems = "center";
-            locDisp.style.gap = "6px";
-            locDisp.innerHTML = `
-            <i data-lucide="map-pin" style="width:14px;height:14px;"></i> ${userLocation}
-          `;
+          const setIdle = () => {
+            btn.dataset.loading = "false";
+            btn.innerHTML = `<i data-lucide="map-pin"></i> <span data-t="detect_farm">${translations[currentLang].detect_farm}</span>`;
             lucide.createIcons();
-          }
+          };
 
-          const cityInput = id("weather-city");
-          if (cityInput) {
-            cityInput.value = city;
-            await fetchWeather();
-          }
+          const handleSuccess = async (city, state) => {
+            console.log("Location Success:", city, state);
+            userLocation = `${city}, ${state}`;
 
-          speakText(
-            `Location detected as ${city}. I am AgriSmart. How can I help you today?`,
-          );
-
-          btn.dataset.loading = "false";
-        };
-
-        const fetchWithTimeout = (url, timeout = 8000) => {
-          return Promise.race([
-            fetch(url),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("Request timeout")), timeout),
-            ),
-          ]);
-        };
-
-        const fallbackToIP = async () => {
-          try {
-            const res = await fetchWithTimeout("https://ipapi.co/json/");
-            const data = await res.json();
-
-            if (data.city) {
-              await handleSuccess(data.city, data.region);
-            } else {
-              throw new Error("No city from IP");
-            }
-          } catch (e) {
-            console.error("IP Location Error:", e);
-
-            setIdle();
-
-            // Better UX than alert
-            speakText(
-              "Unable to detect location. Please enter your city manually.",
+            // Cache location
+            localStorage.setItem(
+              "agri_location",
+              JSON.stringify({ city, state }),
             );
-          }
-        };
 
-        // 🔹 Load from cache first (instant UX)
-        const cached = localStorage.getItem("agri_location");
-        if (cached) {
-          const { city, state } = JSON.parse(cached);
-          handleSuccess(city, state);
-          return;
-        }
+            btn.innerHTML = `<i data-lucide="check"></i> <span data-t="detected">${translations[currentLang].detected}</span>`;
+            lucide.createIcons();
 
-        if (!navigator.geolocation) {
-          fallbackToIP();
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            const { latitude: lat, longitude: lon } = pos.coords;
-
-            try {
-              // 🌍 Using OpenStreetMap (Nominatim) for better rural accuracy in India
-              const res = await fetchWithTimeout(
-                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
-              );
-
-              const data = await res.json();
-              const addr = data.address || {};
-
-              // Improved parsing: prioritize village/town for farmers
-              const city =
-                addr.village ||
-                addr.town ||
-                addr.city ||
-                addr.suburb ||
-                addr.county ||
-                "Your Area";
-
-              const state = addr.state || "";
-
-              await handleSuccess(city, state);
-            } catch (e) {
-              console.error("Reverse Geocode Error:", e);
-              fallbackToIP();
+            const locDisp = id("locationDisplay");
+            if (locDisp) {
+              locDisp.style.display = "flex";
+              locDisp.style.alignItems = "center";
+              locDisp.style.gap = "6px";
+              locDisp.innerHTML = `
+              <i data-lucide="map-pin" style="width:14px;height:14px;"></i> ${userLocation}
+            `;
+              lucide.createIcons();
             }
-          },
-          (err) => {
-            console.warn("GPS Denied or Unavailable:", err);
-            fallbackToIP();
-          },
-          {
-            timeout: 10000,
-            enableHighAccuracy: true,
-          },
-        );
+
+            const cityInput = id("weather-city");
+            if (cityInput) {
+              cityInput.value = city;
+              console.log("Updating weather for:", city);
+              await fetchWeather();
+            }
+
+            speakText(
+              `Location detected as ${city}. I am AgriSmart. How can I help you today?`,
+            );
+
+            btn.dataset.loading = "false";
+          };
+
+          const fetchWithTimeout = (url, timeout = 8000) => {
+            return Promise.race([
+              fetch(url),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Request timeout")), timeout),
+              ),
+            ]);
+          };
+
+          const fallbackToIP = async () => {
+            console.log("Falling back to IP location...");
+            try {
+              const res = await fetchWithTimeout("https://ipapi.co/json/");
+              const data = await res.json();
+
+              if (data.city) {
+                await handleSuccess(data.city, data.region);
+              } else {
+                throw new Error("No city from IP");
+              }
+            } catch (e) {
+              console.error("IP Location Error:", e);
+              setIdle();
+              speakText(
+                "Unable to detect location. Please enter your city manually.",
+              );
+            }
+          };
+
+          // 🔹 Load from cache first (instant UX)
+          const cached = localStorage.getItem("agri_location");
+          if (cached) {
+            try {
+              const { city, state } = JSON.parse(cached);
+              if (city && state) {
+                console.log("Using cached location:", city);
+                await handleSuccess(city, state);
+                return;
+              }
+            } catch (e) {
+              console.error("Cache Error:", e);
+            }
+          }
+
+          if (!navigator.geolocation) {
+            console.log("Geolocation not supported by browser.");
+            await fallbackToIP();
+            return;
+          }
+
+          console.log("Requesting GPS coordinates...");
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const { latitude: lat, longitude: lon } = pos.coords;
+              console.log("GPS coordinates received:", lat, lon);
+
+              try {
+                const res = await fetchWithTimeout(
+                  `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
+                );
+                const data = await res.json();
+                const addr = data.address || {};
+                const city =
+                  addr.village ||
+                  addr.town ||
+                  addr.city ||
+                  addr.suburb ||
+                  addr.county ||
+                  "Your Area";
+                const state = addr.state || "";
+                await handleSuccess(city, state);
+              } catch (e) {
+                console.error("Geocode Error:", e);
+                await fallbackToIP();
+              }
+            },
+            async (err) => {
+              console.warn("GPS Error:", err.message);
+              await fallbackToIP();
+            },
+            { timeout: 10000, enableHighAccuracy: true },
+          );
+        } catch (globalErr) {
+          console.error("Fatal DetectLocation Error:", globalErr);
+        }
       }
 
       // ================================================
@@ -3463,46 +3570,105 @@
         window.speechSynthesis.speak(utterance);
       }
 
-      // Spotlight effect logic
-      document
-        .querySelectorAll(".feature-card, .tool-card, .scheme-card, .tech-card")
-        .forEach((card) => {
-          card.addEventListener("mousemove", (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            card.style.setProperty("--x", x + "px");
-            card.style.setProperty("--y", y + "px");
-          });
+      function updateUI() {
+        document.querySelectorAll("[data-t]").forEach((el) => {
+          const key = el.getAttribute("data-t");
+          if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+          }
         });
 
-      // 🚀 Auto-detect location on load
+        // Update language buttons active state
+        document.querySelectorAll(".lang-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.lang === currentLang);
+        });
+
+        const bubble = id("botBubble");
+        if (bubble) bubble.textContent = translations[currentLang].voice_prompt;
+
+        // Update recognition lang
+        if (recognition) {
+          recognition.lang = currentLang === "te" ? "te-IN" : "en-IN";
+        }
+      }
+
+      function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem("agri_lang", currentLang);
+        updateUI();
+
+        const msg =
+          currentLang === "te"
+            ? "భాష తెలుగులోకి మార్చబడింది."
+            : "Language changed to English.";
+        speakText(msg, currentLang === "te" ? "te-IN" : "en-US");
+      }
+
+      // 🚀 Initialize on load
       window.addEventListener("load", () => {
-        setTimeout(detectLocation, 1000);
+        try {
+          updateUI();
+          lucide.createIcons();
+          console.log("App initialized, triggering location...");
+          setTimeout(detectLocation, 1000);
+        } catch (e) {
+          console.error("Init Error:", e);
+        }
       });
     </script>
 
-    <!-- Detect Location -->
-    <div
-      style="
-        position: fixed;
-        top: 100px;
-        right: 24px;
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 8px;
-      "
-    >
-      <button
-        class="gps-btn"
-        onclick="detectLocation()"
-        id="gpsBtn"
-        style="position: static"
+    <!-- 🛠️ Floating Actions (Top Right) -->
+    <div class="floating-actions">
+      <!-- Dual Language Switcher -->
+      <div
+        class="action-btn"
+        style="padding: 4px; gap: 4px; background: rgba(10, 46, 26, 0.95)"
       >
-        <i data-lucide="map-pin"></i> <span>Detect My Farm</span>
+        <button
+          class="lang-btn"
+          onclick="setLanguage('en')"
+          data-lang="en"
+          style="
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: transparent;
+            color: var(--gray-300);
+          "
+        >
+          EN
+        </button>
+        <button
+          class="lang-btn"
+          onclick="setLanguage('te')"
+          data-lang="te"
+          style="
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: transparent;
+            color: var(--gray-300);
+          "
+        >
+          తె
+        </button>
+      </div>
+
+      <style>
+        .lang-btn.active {
+          background: var(--green-600) !important;
+          color: white !important;
+        }
+      </style>
+
+      <!-- GPS Detector -->
+      <button class="action-btn" onclick="detectLocation()" id="gpsBtn">
+        <i data-lucide="map-pin"></i>
+        <span data-t="detect_farm">Detect My Farm</span>
       </button>
+
       <div
         id="locationDisplay"
         style="
