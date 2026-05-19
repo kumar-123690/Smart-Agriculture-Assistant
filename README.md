@@ -1,7 +1,7 @@
 # 🌿 Smart Agriculture Assistant
 ### AI-Powered Farmer Support System | CSP Project — CSE Department
 
-> **Submitted by:** P Gowthami  
+> **Submitted by:** P Gowthami, M Prem Kumar, T Mrudula
 > **Guided by:** M Tharun Kumar Sir  
 > **Department:** Computer Science & Engineering
 
