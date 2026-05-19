@@ -5,7 +5,7 @@ import os
 
 router = APIRouter()
 
-WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "").strip()
+WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "").strip().strip('"').strip("'")
 
 @router.get("")
 async def get_weather(city: str = Query(..., description="City name")):

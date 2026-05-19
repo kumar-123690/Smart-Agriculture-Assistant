@@ -328,7 +328,7 @@ async function fetchWeather() {
     advisory.style.display = "block";
     advisory.textContent = data.farming_advisory;
   } catch (err) {
-    alert("API Error");
+    alert("API Error: " + err.message);
   }
   if (btn) btn.innerHTML = "Go";
 }
