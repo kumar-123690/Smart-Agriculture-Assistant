@@ -60,17 +60,17 @@ app.include_router(chat_router,    prefix="/api/chat",     tags=["Voice AI Chatb
 
 from fastapi.responses import FileResponse
 
-# ===== FRONTEND ENDPOINTS =====
+# ===== FRONTEND SERVING =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
 
+# Serve frontend static assets (CSS, JS, images)
+app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+
+# Serve index.html at root /
 @app.get("/")
 def serve_index():
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
-
-@app.get("/hero_bg.png")
-def serve_hero():
-    return FileResponse(os.path.join(FRONTEND_DIR, "assets", "hero_bg.png"))
 
 # ===== RUN SERVER =====
 if __name__ == "__main__":

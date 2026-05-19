@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  agri-smart-assistant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agri_smart_assistant
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY:-your_api_key_here}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    restart: always

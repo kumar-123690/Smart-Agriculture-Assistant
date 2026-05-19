@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter
+from fastapi import APIRouter
 from pydantic import BaseModel as BM
 from typing import Optional
 import json
@@ -14,7 +14,12 @@ class SurveyData(BM):
     phone_access: Optional[str] = ""
     language:   Optional[str] = "en"
 
-SURVEY_FILE = "/tmp/survey_responses.json"
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+SURVEY_FILE = os.path.join(DATA_DIR, "survey_responses.json")
 
 @router.post("/submit")
 def submit_survey(data: SurveyData):

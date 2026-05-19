@@ -66,8 +66,8 @@ def load_crop_model():
             crop_model_data = pickle.load(f)
             crop_model = crop_model_data["model"] if isinstance(crop_model_data, dict) else crop_model_data
         print("Crop model loaded successfully")
-    except FileNotFoundError:
-        print("Crop model not found - using fallback rule-based system")
+    except Exception as e:
+        print(f"Crop model not loaded ({e}) - using fallback rule-based system")
 
 load_crop_model()
 

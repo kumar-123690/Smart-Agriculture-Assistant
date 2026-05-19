@@ -25,7 +25,7 @@ if GEMINI_API_KEY and genai:
         print(f"Failed to configure Gemini: {e}")
         model = None
 
-@router.post("/")
+@router.post("")
 async def chat_with_bot(req: ChatRequest):
     if not model:
         return {"response": "నమస్తే! నేను అగ్రిస్మార్ట్. మీ వ్యవసాయ సహాయకుడిని. మీకు ఎలా సహాయపడగలను? (Hello! I am AgriSmart. How can I help you?)"}
