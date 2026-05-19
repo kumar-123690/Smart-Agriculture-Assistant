@@ -5,7 +5,7 @@ import os
 
 router = APIRouter()
 
-WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "your_api_key_here")
+WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "").strip()
 
 @router.get("")
 async def get_weather(city: str = Query(..., description="City name")):
@@ -18,7 +18,7 @@ async def get_weather(city: str = Query(..., description="City name")):
     3. Set env variable: export OPENWEATHER_API_KEY=your_key
     4. Or set it in .env file: OPENWEATHER_API_KEY=your_key
     """
-    if WEATHER_API_KEY == "your_api_key_here":
+    if not WEATHER_API_KEY or WEATHER_API_KEY == "your_api_key_here":
         # Return demo data when no API key configured
         return {
             "city": city,
