@@ -312,7 +312,14 @@ async function fetchWeather() {
     const res = await fetch(
       "/api/weather?city=" + encodeURIComponent(city),
     );
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (jsonErr) {
+      alert(`Server Error: Status ${res.status}. Please check your server logs or API key activation.`);
+      if (btn) btn.innerHTML = "Go";
+      return;
+    }
     if (res.status !== 200) {
       alert(data.detail || "City not found");
       if (btn) btn.innerHTML = "Go";

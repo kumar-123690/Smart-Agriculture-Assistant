@@ -48,6 +48,7 @@ async def get_weather(city: str = Query(..., description="City name")):
                 f"https://api.openweathermap.org/data/2.5/forecast"
                 f"?q={city}&appid={WEATHER_API_KEY}&units=metric&cnt=8"
             )
+            f_resp.raise_for_status()
             forecast = f_resp.json()
             rain_chance = int(forecast["list"][0].get("pop", 0) * 100)
 
@@ -76,6 +77,8 @@ async def get_weather(city: str = Query(..., description="City name")):
             "status":           "success"
         }
     except httpx.HTTPStatusError as e:
+        if e.response.status_code in (401, 403):
+            raise HTTPException(401, detail="Invalid Weather API Key configured on server")
         raise HTTPException(404, detail=f"City '{city}' not found")
     except Exception as e:
         raise HTTPException(500, detail=str(e))
